@@ -26,8 +26,6 @@
       const FRAMERATE = 500;
       const COLS = 20;
       const ROWS = 20;
-      let VEL_COL = 0;
-      let VEL_ROW = 0;
 
       class Dot {
         constructor() {
@@ -82,25 +80,21 @@
 
         up() {
           if (this.vy === 1) return;
-          console.log("Snake up...");
           this.vx = 0;
           this.vy = -1;
         }
         down() {
           if (this.vy === -1) return;
-          console.log("Snake down...");
           this.vx = 0;
           this.vy = 1;
         }
         left() {
           if (this.vx === 1) return;
-          console.log("Snake left...");
           this.vx = -1;
           this.vy = 0;
         }
         right() {
           if (this.vx === -1) return;
-          console.log("Snake right...");
           this.vx = 1;
           this.vy = 0;
         }
@@ -113,9 +107,13 @@
           return this.col === apple.col && this.row === apple.row;
         }
 
-        render() {
+        move() {
           this.col += this.vx;
           this.row += this.vy;
+          this.render();
+        }
+
+        render() {
           let col = this.col;
           let row = this.row;
           this.dots.forEach(d => {
@@ -141,10 +139,13 @@
           this.apple = new AppleDot();
         }
 
+        start() {
+          this.loop();
+        }
+
         loop() {
-          this.snake.render();
+          this.snake.move();
           if (this.snake.ate(this.apple)) {
-            console.log("COMEU!!!");
             this.apple.position();
             this.snake.addDot();
           }
@@ -155,26 +156,21 @@
       }
 
       const game = new Game();
-      game.loop();
-      console.log(game);
+      game.start();
 
       // controller
       document.onkeydown = function(event) {
         switch (event.keyCode) {
           case 37:
-            console.log("Left key pressed");
             game.snake.left();
             break;
           case 38:
-            console.log("Up key pressed");
             game.snake.up();
             break;
           case 39:
-            console.log("Right key pressed");
             game.snake.right();
             break;
           case 40:
-            console.log("Down key pressed");
             game.snake.down();
             break;
         }
