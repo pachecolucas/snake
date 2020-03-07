@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake Game</title>
+    <style>
+      body {
+        background: #333;
+        position: relative;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 100%;
+      }
+      #game {
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <section id="game"></section>
+
+    <script>
+      const SQUARE_SIZE = 20;
+      const FRAMERATE = 500;
+      const COLS = 20;
+      const ROWS = 20;
+      let VEL_COL = 0;
+      let VEL_ROW = 0;
+
+      class Dot {
+        constructor() {
+          this.col = this.row = -1000;
+          // element
+          this.e = document.createElement("div");
+          this.e.style.background = "green";
+          this.e.style.position = "absolute";
+          this.e.style.width = SQUARE_SIZE + "px";
+          this.e.style.height = SQUARE_SIZE + "px";
+          document.getElementById("game").appendChild(this.e);
+          // render
+          this.render();
+        }
+
+        position(col, row) {
+          this.col = col;
+          this.row = row;
+          this.render();
+        }
+
+        render() {
+          this.e.style.top = SQUARE_SIZE * this.row + "px";
+          this.e.style.left = SQUARE_SIZE * this.col + "px";
+        }
+      }
+
+      class AppleDot extends Dot {
+        constructor() {
+          super();
+          this.position();
+          this.e.style.background = "red";
+          // render
+          this.render();
+        }
+
+        position() {
+          this.col = Math.floor(Math.random() * COLS);
+          this.row = Math.floor(Math.random() * ROWS);
+          this.render();
+        }
+      }
+
+      class Snake {
+        constructor() {
+          this.vx = 0;
+          this.vy = 0;
+          this.col = 10;
+          this.row = 10;
+          this.dots = [new Dot()];
+        }
+
+        up() {
+          if (this.vy === 1) return;
+          console.log("Snake up...");
+          this.vx = 0;
+          this.vy = -1;
+        }
+        down() {
+          if (this.vy === -1) return;
+          console.log("Snake down...");
+          this.vx = 0;
+          this.vy = 1;
+        }
+        left() {
+          if (this.vx === 1) return;
+          console.log("Snake left...");
+          this.vx = -1;
+          this.vy = 0;
+        }
+        right() {
+          if (this.vx === -1) return;
+          console.log("Snake right...");
+          this.vx = 1;
+          this.vy = 0;
+        }
+
+        addDot() {
+          this.dots.push(new Dot());
+        }
+
+        ate(apple) {
+          return this.col === apple.col && this.row === apple.row;
+        }
+
+        render() {
+          this.col += this.vx;
+          this.row += this.vy;
+          let col = this.col;
+          let row = this.row;
+          this.dots.forEach(d => {
+            let nextCol = d.col;
+            let nextRow = d.row;
+            d.position(col, row);
+            col = nextCol;
+            row = nextRow;
+          });
+        }
+      }
+
+      class Game {
+        constructor() {
+          // element
+          this.e = document.getElementById("game");
+          this.e.style.width = SQUARE_SIZE * COLS + "px";
+          this.e.style.height = SQUARE_SIZE * ROWS + "px";
+          this.e.style.position = "relative";
+          this.e.style.background = "#223";
+          // snake
+          this.snake = new Snake();
+          this.apple = new AppleDot();
+        }
+
+        loop() {
+          this.snake.render();
+          if (this.snake.ate(this.apple)) {
+            console.log("COMEU!!!");
+            this.apple.position();
+            this.snake.addDot();
+          }
+          setTimeout(() => {
+            this.loop();
+          }, FRAMERATE);
+        }
+      }
+
+      const game = new Game();
+      game.loop();
+      console.log(game);
+
+      // controller
+      document.onkeydown = function(event) {
+        switch (event.keyCode) {
+          case 37:
+            console.log("Left key pressed");
+            game.snake.left();
+            break;
+          case 38:
+            console.log("Up key pressed");
+            game.snake.up();
+            break;
+          case 39:
+            console.log("Right key pressed");
+            game.snake.right();
+            break;
+          case 40:
+            console.log("Down key pressed");
+            game.snake.down();
+            break;
+        }
+      };
+    </script>
+  </body>
+</html>
